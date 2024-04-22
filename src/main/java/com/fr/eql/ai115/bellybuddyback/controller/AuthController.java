@@ -2,7 +2,6 @@ package com.fr.eql.ai115.bellybuddyback.controller;
 
 import com.fr.eql.ai115.bellybuddyback.dto.LoginDto;
 import com.fr.eql.ai115.bellybuddyback.dto.RegisterDto;
-import com.fr.eql.ai115.bellybuddyback.model.Role;
 import com.fr.eql.ai115.bellybuddyback.model.UserEntity;
 import com.fr.eql.ai115.bellybuddyback.security.jwt.JwtUtil;
 import com.fr.eql.ai115.bellybuddyback.service.CustomUserDetailsService;
@@ -42,10 +41,6 @@ public class AuthController {
     UserEntity user = new UserEntity();
     user.setUsername(registerDto.getUsername());
     user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
-
-    Role roles = new Role();
-    roles.setName("USER");
-    user.setRoles(Collections.singletonList(roles));
     userService.registerNewUser(user);
     return ResponseEntity.ok("User registered successfully!");
   }
