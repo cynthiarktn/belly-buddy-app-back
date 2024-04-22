@@ -41,6 +41,7 @@ public class AuthController {
     UserEntity user = new UserEntity();
     user.setUsername(registerDto.getUsername());
     user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
+    user.setEmail(registerDto.getEmail());
     userService.registerNewUser(user);
     return ResponseEntity.ok("User registered successfully!");
   }
