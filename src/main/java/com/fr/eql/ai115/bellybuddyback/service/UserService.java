@@ -26,6 +26,13 @@ public class UserService {
     return userRepository.save(newUserEntity);
   }
 
+  public UserEntity findByUsername(String username) {
+    return userRepository.findByUsername(username)
+      .orElseThrow(() -> new RuntimeException("Error: User not found."));
+  }
 
+  public boolean existsByUsername(String username) {
+    return userRepository.existsByUsername(username);
+  }
 
 }
