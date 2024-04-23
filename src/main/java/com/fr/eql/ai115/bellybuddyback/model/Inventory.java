@@ -7,21 +7,23 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
-@Table(name = "recipes")
+@Table(name = "inventory")
 @Data
 @NoArgsConstructor
-public class RecipeEntity {
+public class Inventory {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int recipeId;
-  private String name;
-  private String description;
+  private int inventoryId;
+
+  @OneToOne
+  @JoinColumn(name = "user_id")
+  private UserEntity user;
 
   @ManyToMany
   @JoinTable(
-    name = "recipe_ingredient",
-    joinColumns = @JoinColumn(name = "recipe_id"),
+    name = "inventory_ingredient",
+    joinColumns = @JoinColumn(name = "inventory_id"),
     inverseJoinColumns = @JoinColumn(name = "ingredient_id"))
-  private List<IngredientEntity> ingredients;
+  private List<Ingredient> ingredients;
 }

@@ -4,15 +4,20 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
-@Table(name = "ingredients")
+@Table(name = "ingredient")
 @Data
 @NoArgsConstructor
-public class IngredientEntity {
+public class Ingredient {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int ingredientId;
   private String name;
-  private String unit;
+  private Double quantity;
+  private LocalDate expirationDate;
+
+
 }

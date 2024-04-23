@@ -1,4 +1,4 @@
-package com.fr.eql.ai115.bellybuddyback.security;
+package com.fr.eql.ai115.bellybuddyback.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

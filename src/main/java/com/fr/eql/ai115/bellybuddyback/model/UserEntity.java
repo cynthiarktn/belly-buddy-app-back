@@ -20,4 +20,10 @@ public class UserEntity {
   private String username;
   private String email;
   private String password;
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  private Inventory inventory;
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  private FavoriteList favoriteList;
 }
