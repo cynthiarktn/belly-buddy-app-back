@@ -8,12 +8,14 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JWTGenerator {
-  private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+  private static final String secretKey = SecretKeyGenerator.generateNewSecretKey();
+  private static final Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 
   public String generateToken(Authentication authentication) {
     String username = authentication.getName();

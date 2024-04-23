@@ -25,45 +25,34 @@ public class InventoryController {
     this.spoonacularService = spoonacularService;
   }
 
-  @GetMapping
+  @GetMapping("/ingredients")
   public ResponseEntity<List<String>> getInventoryIngredients(@AuthenticationPrincipal UserDetails userDetails) {
     int userId = Integer.parseInt(userDetails.getUsername());
-    List<String> ingredients = inventoryService.getInventoryIngredients(userId);
+    List<String> ingredients = inventoryService.getInventoryIngredients(userDetails.getUsername());
     return ResponseEntity.ok(ingredients);
+  }
+
+  @GetMapping("/search/ingredient")
+  public ResponseEntity<IngredientSearchResponse> searchIngredient(@RequestParam String name) {
+    IngredientSearchResponse response = spoonacularService.searchIngredient(name).block();
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping("/add")
   public ResponseEntity<?> addIngredientToInventory(@AuthenticationPrincipal UserDetails userDetails, @RequestBody Ingredient ingredient) {
-    if (userDetails == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
-    }
-    int userId = Integer.parseInt(userDetails.getUsername());
-
-    // Search for the ingredient in the Spoonacular API
-    IngredientSearchResponse response = spoonacularService.searchIngredient(ingredient.getName()).block();
-
-    // If the ingredient is not found in the Spoonacular API, return a bad request response
-    if (response == null || response.getResults().isEmpty()) {
-      return ResponseEntity.badRequest().body("Ingredient not found in Spoonacular API");
-    }
-
-    // If the ingredient is found, add it to the inventory
-    inventoryService.addIngredientToInventory(userId, ingredient);
-
+    inventoryService.addIngredientToInventory(userDetails.getUsername(), ingredient);
     return ResponseEntity.ok().build();
   }
 
   @DeleteMapping("/remove")
   public ResponseEntity<Void> removeIngredientFromInventory(@AuthenticationPrincipal UserDetails userDetails, @RequestBody Ingredient ingredient) {
-    int userId = Integer.parseInt(userDetails.getUsername());
-    inventoryService.removeIngredientFromInventory(userId, ingredient);
+    inventoryService.removeIngredientFromInventory(userDetails.getUsername(), ingredient);
     return ResponseEntity.ok().build();
   }
 
   @PutMapping("/update")
   public ResponseEntity<Void> updateIngredientInInventory(@AuthenticationPrincipal UserDetails userDetails, @RequestBody Ingredient ingredient) {
-    int userId = Integer.parseInt(userDetails.getUsername());
-    inventoryService.updateIngredientInInventory(userId, ingredient);
+    inventoryService.updateIngredientInInventory(userDetails.getUsername(), ingredient);
     return ResponseEntity.ok().build();
   }
 

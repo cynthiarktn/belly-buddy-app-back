@@ -16,10 +16,10 @@ public class SpoonacularService {
         this.webClient = WebClient.create();
     }
 
-    public Mono<RecipeSearchResponse> searchRecipes(String query) {
+    public Mono<RecipeSearchResponse> searchRecipesByIngredients(String query) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(BASE_URL + "/recipes/complexSearch")
+                        .path(BASE_URL + "/recipes/findByIngredients")
                         .queryParam("query", query)
                         .queryParam("apiKey", API_KEY)
                         .build())
