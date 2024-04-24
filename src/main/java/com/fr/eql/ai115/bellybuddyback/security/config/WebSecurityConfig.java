@@ -29,9 +29,11 @@ public class WebSecurityConfig {
     this.authEntryPointJwt = authEntryPointJwt;
     this.userDetailsService = userDetailsService;
   }
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf((csrf) -> csrf.disable())
+    http
+      .csrf((csrf) -> csrf.disable())
       .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(authEntryPointJwt))
       .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
       .authorizeHttpRequests((authorize) -> {
@@ -39,10 +41,16 @@ public class WebSecurityConfig {
         authorize.requestMatchers("/api/public/**").permitAll()
           .anyRequest().permitAll();
       })
+      .logout(logout -> logout
+        .logoutUrl("/logout")
+        .invalidateHttpSession(true)
+        .logoutSuccessUrl("/login"))
       .httpBasic(Customizer.withDefaults());
+
     http.addFilterBefore((jwtAuthenticationFilter()), UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
+
   @Bean
   public AuthenticationManager authenticationManager(
     AuthenticationConfiguration configuration) throws Exception {

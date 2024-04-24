@@ -1,11 +1,10 @@
 package com.fr.eql.ai115.bellybuddyback.controller;
 
-import com.fr.eql.ai115.bellybuddyback.dto.IngredientSearchResponse;
-import com.fr.eql.ai115.bellybuddyback.model.Ingredient;
+import com.fr.eql.ai115.bellybuddyback.model.InventoryItem;
+import com.fr.eql.ai115.bellybuddyback.model.UserEntity;
 import com.fr.eql.ai115.bellybuddyback.service.InventoryService;
 import com.fr.eql.ai115.bellybuddyback.service.SpoonacularService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,39 +24,18 @@ public class InventoryController {
     this.spoonacularService = spoonacularService;
   }
 
-  @GetMapping("/ingredients")
-  public ResponseEntity<List<String>> getInventoryIngredients(@AuthenticationPrincipal UserDetails userDetails) {
-    int userId = Integer.parseInt(userDetails.getUsername());
-    List<String> ingredients = inventoryService.getInventoryIngredients(userDetails.getUsername());
+  @GetMapping("/getIngredients")
+  public ResponseEntity<List<InventoryItem>> getInventoryIngredients(@AuthenticationPrincipal UserDetails userDetails) throws Exception {
+    List<InventoryItem> ingredients = inventoryService.getAllInventoryItems(userDetails.getUsername());
     return ResponseEntity.ok(ingredients);
   }
 
-  @GetMapping("/search/ingredient")
-  public ResponseEntity<IngredientSearchResponse> searchIngredient(@RequestParam String name) {
-    IngredientSearchResponse response = spoonacularService.searchIngredient(name).block();
-    return ResponseEntity.ok(response);
+  @PostMapping("/addIngredient")
+  public ResponseEntity<InventoryItem> addIngredient(@RequestBody InventoryItem inventoryItem, @AuthenticationPrincipal UserDetails userDetails) {
+    UserEntity user = (UserEntity) userDetails;
+    InventoryItem addedItem = inventoryService.addInventoryItem(inventoryItem);
+    return ResponseEntity.ok(addedItem);
   }
 
-  @PostMapping("/add")
-  public ResponseEntity<?> addIngredientToInventory(@AuthenticationPrincipal UserDetails userDetails, @RequestBody Ingredient ingredient) {
-    inventoryService.addIngredientToInventory(userDetails.getUsername(), ingredient);
-    return ResponseEntity.ok().build();
-  }
 
-  @DeleteMapping("/remove")
-  public ResponseEntity<Void> removeIngredientFromInventory(@AuthenticationPrincipal UserDetails userDetails, @RequestBody Ingredient ingredient) {
-    inventoryService.removeIngredientFromInventory(userDetails.getUsername(), ingredient);
-    return ResponseEntity.ok().build();
-  }
-
-  @PutMapping("/update")
-  public ResponseEntity<Void> updateIngredientInInventory(@AuthenticationPrincipal UserDetails userDetails, @RequestBody Ingredient ingredient) {
-    inventoryService.updateIngredientInInventory(userDetails.getUsername(), ingredient);
-    return ResponseEntity.ok().build();
-  }
-
-  @ExceptionHandler(RuntimeException.class)
-  public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
-    return ResponseEntity.badRequest().body(ex.getMessage());
-  }
 }

@@ -1,65 +1,53 @@
 package com.fr.eql.ai115.bellybuddyback.service;
 
-import com.fr.eql.ai115.bellybuddyback.dto.IngredientSearchResponse;
-import com.fr.eql.ai115.bellybuddyback.model.Ingredient;
-import com.fr.eql.ai115.bellybuddyback.model.Inventory;
-import com.fr.eql.ai115.bellybuddyback.repository.InventoryRepository;
+import com.fr.eql.ai115.bellybuddyback.exception.InventoryExceptions;
+import com.fr.eql.ai115.bellybuddyback.model.InventoryItem;
+import com.fr.eql.ai115.bellybuddyback.model.UserEntity;
+import com.fr.eql.ai115.bellybuddyback.repository.InventoryItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class InventoryService {
-  private final InventoryRepository inventoryRepository;
+
+  private final InventoryItemRepository inventoryRepository;
 
   @Autowired
-  private SpoonacularService spoonacularService;
-
-  @Autowired
-  public InventoryService(InventoryRepository inventoryRepository) {
+  public InventoryService(InventoryItemRepository inventoryRepository) {
     this.inventoryRepository = inventoryRepository;
   }
 
-  public List<String> getInventoryIngredients(String username) {
-    Inventory inventory = getInventoryByUsername(username);
-    if (inventory.getIngredients().isEmpty()) {
-      throw new RuntimeException("Inventory is empty for user with username " + username);
+  // Cette méthode récupère tous les éléments de l'inventaire
+  public List<InventoryItem> getAllInventoryItems(String username) throws Exception {
+    if (username == null) {
+      throw new Exception("No user found");
     }
-    return inventory.getIngredients().stream()
-      .map(Ingredient::getName)
-      .collect(Collectors.toList());
+    return inventoryRepository.findAll();
   }
 
-  public void addIngredientToInventory(String username, Ingredient ingredient) {
-    Inventory inventory = getInventoryByUsername(username);
-    inventory.getIngredients().add(ingredient);
-    inventoryRepository.save(inventory);
-  }
-
-  public void removeIngredientFromInventory(String username, Ingredient ingredient) {
-    Inventory inventory = getInventoryByUsername(username);
-    if (!inventory.getIngredients().remove(ingredient)) {
-      throw new RuntimeException("Ingredient not found in inventory");
+  // Cette méthode ajoute un nouvel élément à l'inventaire
+  public InventoryItem addInventoryItem(InventoryItem item) {
+    if (inventoryRepository.existsById(item.getId())) {
+      throw new InventoryExceptions.InventoryItemAlreadyExistsException(item.getId());
     }
-    inventoryRepository.save(inventory);
+    return inventoryRepository.save(item);
   }
 
-  public void updateIngredientInInventory(String username, Ingredient ingredient) {
-    Inventory inventory = getInventoryByUsername(username);
-    int index = inventory.getIngredients().indexOf(ingredient);
-    if (index != -1) {
-      inventory.getIngredients().set(index, ingredient);
-      inventoryRepository.save(inventory);
-    } else {
-      throw new RuntimeException("Ingredient not found in inventory");
+  // Cette méthode met à jour un élément de l'inventaire
+  public InventoryItem updateInventoryItem(InventoryItem item) {
+    if (!inventoryRepository.existsById(item.getId())) {
+      throw new InventoryExceptions.InventoryItemNotFoundException(item.getId());
     }
+    return inventoryRepository.save(item);
   }
 
-  private Inventory getInventoryByUsername(String username) {
-    return inventoryRepository.findByUser_Username(username)
-      .orElseThrow(() -> new RuntimeException("No inventory found for user " + username));
+  // Cette méthode supprime un élément de l'inventaire
+  public void deleteInventoryItem(Long id) {
+    if (!inventoryRepository.existsById(id)) {
+      throw new InventoryExceptions.InventoryItemNotFoundException(id);
+    }
+    inventoryRepository.deleteById(id);
   }
 }

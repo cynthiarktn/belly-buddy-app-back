@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,14 +14,14 @@ public class UserEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int userId;
+  private Long id;
   private String username;
   private String email;
   private String password;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-  private Inventory inventory;
+  @OneToMany(mappedBy = "user")
+  private List<InventoryItem> inventory;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-  private FavoriteList favoriteList;
+  @OneToMany(mappedBy = "user")
+  private List<Favorite> favorites;
 }

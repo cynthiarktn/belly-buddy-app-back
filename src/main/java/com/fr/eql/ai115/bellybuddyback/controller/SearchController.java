@@ -1,14 +1,14 @@
 package com.fr.eql.ai115.bellybuddyback.controller;
 
-import com.fr.eql.ai115.bellybuddyback.dto.IngredientSearchResponse;
-import com.fr.eql.ai115.bellybuddyback.dto.RecipeSearchResponse;
+import com.fr.eql.ai115.bellybuddyback.dto.IngredientDto;
+import com.fr.eql.ai115.bellybuddyback.dto.RecipeDto;
 import com.fr.eql.ai115.bellybuddyback.service.SpoonacularService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -17,13 +17,14 @@ public class SearchController {
   @Autowired
   private SpoonacularService spoonacularService;
 
-  @GetMapping("/searchIngredient")
-  public Mono<IngredientSearchResponse> searchIngredient(@RequestParam String query) {
-    return spoonacularService.searchIngredient(query);
+  @GetMapping("/searchIngredient/{ingredient}")
+  public IngredientDto searchIngredient(@PathVariable String ingredient) {
+    return spoonacularService.searchIngredient(ingredient);
   }
 
-  @GetMapping("/searchRecipes")
-  public Mono<RecipeSearchResponse> searchRecipes(@RequestParam String query) {
-    return spoonacularService.searchRecipesByIngredients(query);
+  @GetMapping("/searchRecipesByIngredients/{ingredients}")
+  public ResponseEntity<List<RecipeDto>> searchRecipesByIngredients(@PathVariable List<String> ingredients) {
+    List<RecipeDto> recipes = spoonacularService.searchRecipesByIngredients(ingredients);
+    return ResponseEntity.ok(recipes);
   }
 }
