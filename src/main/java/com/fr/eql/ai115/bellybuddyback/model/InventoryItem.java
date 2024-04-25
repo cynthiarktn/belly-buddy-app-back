@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
-
 @Entity
 @Table(name = "inventory")
 @Data
@@ -16,9 +14,10 @@ public class InventoryItem {
   private Long id;
 
   @ManyToOne
+  @JoinColumn(name = "ingredient_id")
+  private Ingredient ingredient;
+
+  @ManyToOne
   private UserEntity user;
 
-  private String name;
-  private Double amount;
-  private String unit;
 }

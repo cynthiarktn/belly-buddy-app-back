@@ -12,10 +12,10 @@ public class Favorite {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  private Long recipeId;
+  private String recipeName;
 
   @ManyToOne
   private UserEntity user;
 
-  private int spoonacularId;
-  private String recipeName;
 }

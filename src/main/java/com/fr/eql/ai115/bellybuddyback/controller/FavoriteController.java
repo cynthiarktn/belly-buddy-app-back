@@ -1,9 +1,9 @@
 package com.fr.eql.ai115.bellybuddyback.controller;
 
-import com.fr.eql.ai115.bellybuddyback.dto.RecipeDto;
 import com.fr.eql.ai115.bellybuddyback.model.Favorite;
 import com.fr.eql.ai115.bellybuddyback.model.UserEntity;
 import com.fr.eql.ai115.bellybuddyback.service.FavoriteService;
+import com.fr.eql.ai115.bellybuddyback.spoonaculardto.CompleteRecipe;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,16 +21,16 @@ public class FavoriteController {
   }
 
   @GetMapping("/getFavorites")
-  public ResponseEntity<List<RecipeDto>> getFavorites(@AuthenticationPrincipal UserDetails userDetails) {
+  public ResponseEntity<List<CompleteRecipe>> getFavorites(@AuthenticationPrincipal UserDetails userDetails) {
     UserEntity user = (UserEntity) userDetails;
-    List<RecipeDto> favorites = favoriteService.getFavoritesByUserId(user.getId());
+    List<CompleteRecipe> favorites = favoriteService.getFavoritesByUserId(user.getId());
     return ResponseEntity.ok(favorites);
   }
 
   @PostMapping("/addFavorite")
-  public ResponseEntity<Favorite> addFavorite(@AuthenticationPrincipal UserDetails userDetails, @RequestBody Favorite favorite) {
+  public ResponseEntity<Favorite> addFavorite(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CompleteRecipe recipe) {
     UserEntity user = (UserEntity) userDetails;
-    favoriteService.addFavorite(user.getId(), favorite.getSpoonacularId(), favorite.getRecipeName());
+    Favorite favorite = favoriteService.addFavorite(recipe, user.getId());
     return ResponseEntity.ok(favorite);
   }
 

@@ -15,17 +15,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/public/users/")
-public class UserController {
+public class AuthController {
 
-  private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+  private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
   private final AuthenticationManager authenticationManager;
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
@@ -33,7 +31,7 @@ public class UserController {
   private final CustomUserDetailsService userDetailsService;
 
   @Autowired
-  public UserController(AuthenticationManager authenticationManager,
+  public AuthController(AuthenticationManager authenticationManager,
                         UserRepository userRepository,
                         PasswordEncoder passwordEncoder,
                         JWTGenerator tokenGenerator,
@@ -68,11 +66,5 @@ public class UserController {
     SecurityContextHolder.getContext().setAuthentication(authentication);
     String jwt = tokenGenerator.generateToken(authentication);
     return new ResponseEntity<>(new AuthResponseDto(jwt), HttpStatus.OK);
-  }
-
-  @GetMapping("/profile")
-  public UserEntity getProfile(@AuthenticationPrincipal UserDetails userDetails) {
-    UserEntity user = userDetailsService.getUserProfile(userDetails.getUsername());
-    return user;
   }
 }

@@ -1,5 +1,6 @@
 package com.fr.eql.ai115.bellybuddyback.dto;
 
+import com.fr.eql.ai115.bellybuddyback.spoonaculardto.RecipeIngredient;
 import lombok.Data;
 
 import java.util.List;
@@ -8,9 +9,6 @@ import java.util.List;
 public class InventoryItemDto {
 
   private Long id;
-  private List<IngredientDto> ingredients;
   private String name;
-  private Double amount;
-  private String unit;
-  private String imageUrl;
+
 }
