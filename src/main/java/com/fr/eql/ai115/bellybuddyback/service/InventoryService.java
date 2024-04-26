@@ -1,5 +1,6 @@
 package com.fr.eql.ai115.bellybuddyback.service;
 
+import com.fr.eql.ai115.bellybuddyback.dto.InventoryItemDto;
 import com.fr.eql.ai115.bellybuddyback.model.Ingredient;
 import com.fr.eql.ai115.bellybuddyback.model.InventoryItem;
 import com.fr.eql.ai115.bellybuddyback.model.UserEntity;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InventoryService {
@@ -38,11 +40,29 @@ public class InventoryService {
   }
 
   // Cette méthode ajoute un nouvel élément à l'inventaire
-  public InventoryItem addIngredientToInventory(Ingredient ingredient, UserEntity user) {
+  public InventoryItemDto addIngredientToInventory(Ingredient ingredient, UserEntity user) {
+    // Check if the ingredient already exists in the database
+    Optional<Ingredient> existingIngredient = ingredientRepository.findById(ingredient.getId());
+    if (!existingIngredient.isPresent()) {
+      // If the ingredient does not exist, save it
+      ingredient = ingredientRepository.save(ingredient);
+    } else {
+      // If the ingredient exists, use the existing one
+      ingredient = existingIngredient.get();
+    }
+
+    // Create the new inventory item
     InventoryItem item = new InventoryItem();
     item.setIngredient(ingredient);
     item.setUser(user);
-    return inventoryRepository.save(item);
+    InventoryItem savedItem = inventoryRepository.save(item);
+
+    // Convert to DTO
+    InventoryItemDto dto = new InventoryItemDto();
+    dto.setId(savedItem.getId());
+    dto.setName(savedItem.getIngredient().getName());
+
+    return dto;
   }
 
   // Cette méthode met à jour un élément de l'inventaire

@@ -5,8 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class FavoriteRecipeDto {
+public class RecipeInstructionsDto {
   private Long id;
-  private String title;
-  private String image;
+  private List<InstructionsStepsDto> steps;
 }

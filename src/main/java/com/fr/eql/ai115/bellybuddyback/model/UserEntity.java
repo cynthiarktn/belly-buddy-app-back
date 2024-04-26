@@ -23,5 +23,5 @@ public class UserEntity {
   private List<InventoryItem> inventory;
 
   @OneToMany(mappedBy = "user")
-  private List<Favorite> favorites;
+  private List<FavoriteRecipe> favoriteRecipes;
 }

@@ -1,10 +1,9 @@
-package com.fr.eql.ai115.bellybuddyback.spoonaculardto;
+package com.fr.eql.ai115.bellybuddyback.dto;
 
 import lombok.Data;
 
 @Data
-public class RecipeIngredient {
-
+public class RecipeIngredientDto {
   private Long id;
   private String name;
   private String image;

@@ -41,4 +41,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     return user;
   }
 
+  public UserEntity get(Long id) {
+    return userRepository.findById(id).orElse(null);
+  }
+
 }

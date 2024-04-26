@@ -1,5 +1,6 @@
 package com.fr.eql.ai115.bellybuddyback.controller;
 
+import com.fr.eql.ai115.bellybuddyback.dto.InventoryItemDto;
 import com.fr.eql.ai115.bellybuddyback.model.Ingredient;
 import com.fr.eql.ai115.bellybuddyback.model.InventoryItem;
 import com.fr.eql.ai115.bellybuddyback.model.UserEntity;
@@ -33,10 +34,10 @@ public class InventoryController {
   }
 
   @PostMapping("/addIngredient")
-  public ResponseEntity<InventoryItem> addIngredient(@RequestBody Ingredient ingredient, Principal principal) throws Exception {
+  public ResponseEntity<InventoryItemDto> addIngredient(@RequestBody Ingredient ingredient, Principal principal) throws Exception {
     UserEntity user = userRepository.findByUsername(principal.getName())
       .orElseThrow(() -> new Exception("User not found"));
-    InventoryItem addedItem = inventoryService.addIngredientToInventory(ingredient, user);
+    InventoryItemDto addedItem = inventoryService.addIngredientToInventory(ingredient, user);
     return ResponseEntity.ok(addedItem);
   }
 

@@ -8,14 +8,15 @@ import lombok.NoArgsConstructor;
 @Table(name = "favorite_list")
 @Data
 @NoArgsConstructor
-public class Favorite {
+public class FavoriteRecipe {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private Long recipeId;
-  private String recipeName;
+
+  @ManyToOne
+  @JoinColumn(name = "recipe_id")
+  private Recipe recipe;
 
   @ManyToOne
   private UserEntity user;
-
 }
