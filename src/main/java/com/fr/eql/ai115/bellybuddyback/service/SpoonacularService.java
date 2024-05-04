@@ -73,7 +73,6 @@ public class SpoonacularService {
   }
 
 
-
   // RecipesServices
 
   // Searching for recipes by ingredients
@@ -138,71 +137,6 @@ public Set<String> autocompleteRecipeSearch(String partialRecipe) throws Excepti
     }
     return response.getBody();
   }
-
-  // Getting recipe instructions
-  public Set<InstructionsStepsResponse> getAnalyzedInstructions(Long recipeId) throws Exception {
-    String url = "https://api.spoonacular.com/recipes/" + recipeId + "/analyzedInstructions?apiKey=" + apiKey;
-    ResponseEntity<Set<InstructionsStepsResponse>> response;
-    try {
-      response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-      });
-    } catch (RestClientException e) {
-      throw new Exception("Error while fetching recipe instructions");
-
-    }
-    if (response.getBody() == null || response.getBody().isEmpty()) {
-      throw new Exception("No instructions found for this recipe");
-    }
-    return response.getBody();
-  }
-
-  // Getting recipe ingredients
-  public Set<RecipeIngredientResponse> getIngredientsForRecipe(Long recipeId) throws Exception {
-    String url = "https://api.spoonacular.com/recipes/" + recipeId + "/ingredientWidget.json?apiKey=" + apiKey;
-    ResponseEntity<Set<RecipeIngredientResponse>> response;
-    try {
-      response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Set<RecipeIngredientResponse>>() {});
-    } catch (RestClientException e) {
-      throw new Exception("Error while fetching ingredients for recipe");
-    }
-    if (response.getBody() == null || response.getBody().isEmpty()) {
-      throw new Exception("No ingredients found for this recipe id");
-    }
-    return response.getBody();
-  }
-
-  // Getting a random recipes
-  public Set<CompleteRecipeResponse> getRandomRecipes() throws Exception {
-    String url = "https://api.spoonacular.com/recipes/random?number=9&apiKey=" + apiKey;
-    ResponseEntity<Set<CompleteRecipeResponse>> response;
-    try {
-      response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-      });
-    } catch (RestClientException e) {
-      throw new Exception("Error while fetching random recipes");
-    }
-    if (response.getBody() == null || response.getBody().isEmpty()) {
-      throw new Exception("No random recipes found");
-    }
-    return response.getBody();
-  }
-
-  // Getting recipes by inventory ingredients
-  public List<RecipesByIngredientsResponse> getRecipesByInventoryIngredients(Set<String> ingredients) throws Exception {
-    String url = "https://api.spoonacular.com/recipes/findByIngredients?ingredients=" + String.join(",", ingredients) + "&number=9&apiKey=" + apiKey;
-    ResponseEntity<List<RecipesByIngredientsResponse>> response;
-    try {
-      response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-      });
-    } catch (RestClientException e) {
-      throw new Exception("Error while fetching recipes by inventory ingredients");
-    }
-    if (response.getBody() == null || response.getBody().isEmpty()) {
-      throw new Exception("No recipes found by inventory ingredients");
-    }
-    return response.getBody();
-  }
-
 
 
 }

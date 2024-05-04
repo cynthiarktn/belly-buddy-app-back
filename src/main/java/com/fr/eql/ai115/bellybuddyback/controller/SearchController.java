@@ -1,9 +1,6 @@
 package com.fr.eql.ai115.bellybuddyback.controller;
 
-import com.fr.eql.ai115.bellybuddyback.dto.apiresponse.CompleteRecipeResponse;
-import com.fr.eql.ai115.bellybuddyback.dto.apiresponse.IngredientResponse;
-import com.fr.eql.ai115.bellybuddyback.dto.apiresponse.IngredientResultsResponse;
-import com.fr.eql.ai115.bellybuddyback.dto.apiresponse.RecipesByIngredientsResponse;
+import com.fr.eql.ai115.bellybuddyback.dto.apiresponse.*;
 import com.fr.eql.ai115.bellybuddyback.service.SpoonacularService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,15 +19,11 @@ public class SearchController {
     this.spoonacularService = spoonacularService;
   }
 
+
+// INGREDIENTS
   @GetMapping("/searchIngredient/{ingredient}")
   public IngredientResultsResponse searchIngredient(@PathVariable String ingredient) throws Exception {
     return spoonacularService.searchIngredient(ingredient);
-  }
-
-  @GetMapping("/searchRecipesByIngredients/{ingredients}")
-  public ResponseEntity<Set<RecipesByIngredientsResponse>> searchRecipesByIngredients(@PathVariable Set<String> ingredients) throws Exception {
-    Set<RecipesByIngredientsResponse> recipes = spoonacularService.searchRecipesByIngredients(ingredients);
-    return ResponseEntity.ok(recipes);
   }
 
   @GetMapping("/recipeInformation/{id}")
@@ -49,5 +42,25 @@ public class SearchController {
   public ResponseEntity<IngredientResponse> getIngredientInformation(@PathVariable Long id) throws Exception {
     IngredientResponse ingredient = spoonacularService.getIngredientInformation(id);
     return ResponseEntity.ok(ingredient);
+  }
+
+
+  // RECIPES
+  @GetMapping("/searchRecipesByIngredients/{ingredients}")
+  public ResponseEntity<Set<RecipesByIngredientsResponse>> searchRecipesByIngredients(@PathVariable Set<String> ingredients) throws Exception {
+    Set<RecipesByIngredientsResponse> recipes = spoonacularService.searchRecipesByIngredients(ingredients);
+    return ResponseEntity.ok(recipes);
+  }
+
+  @GetMapping("/autocompleteRecipeSearch/{partialRecipe}")
+  public ResponseEntity<Set<String>> autocompleteRecipeSearch(@PathVariable String partialRecipe) throws Exception {
+    Set<String> recipes = spoonacularService.autocompleteRecipeSearch(partialRecipe);
+    return ResponseEntity.ok(recipes);
+  }
+
+  @GetMapping("/searchRecipeName/{recipeName}")
+  public ResponseEntity<Set<RecipesByNameResponse>> searchRecipesByName(@PathVariable String recipeName) throws Exception {
+    Set<RecipesByNameResponse> recipes = spoonacularService.searchRecipesByName(recipeName);
+    return ResponseEntity.ok(recipes);
   }
 }

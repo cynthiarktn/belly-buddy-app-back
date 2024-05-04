@@ -13,5 +13,4 @@ public class CompleteRecipeResponse {
   private int readyInMinutes;
   private Set<String> dishTypes;
   private Set<RecipeIngredientResponse> extendedIngredients;
-  private Set<InstructionResponse> analyzedInstructions;
 }

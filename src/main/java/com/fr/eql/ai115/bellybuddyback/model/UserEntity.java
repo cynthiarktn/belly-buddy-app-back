@@ -30,7 +30,7 @@ public class UserEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);  // Encore, utilisez uniquement l'ID
+    return Objects.hash(id);
   }
 
   @Override
@@ -38,7 +38,7 @@ public class UserEntity {
     if (this == obj) return true;
     if (obj == null || getClass() != obj.getClass()) return false;
     UserEntity that = (UserEntity) obj;
-    return Objects.equals(id, that.id);  // Comparez uniquement les IDs
+    return Objects.equals(id, that.id);
   }
 
 }

@@ -25,7 +25,6 @@ public class InventoryService {
   @Autowired
   private UserRepository userRepository;
 
-  // Supposons que vous avez un méthode pour obtenir ou créer un inventaire
   public Inventory findOrCreateInventoryForUser(Long userId) {
     UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
     Inventory inventory = user.getInventory();

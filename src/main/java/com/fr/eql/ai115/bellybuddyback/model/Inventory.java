@@ -28,7 +28,7 @@ public class Inventory {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);  // Utilisez uniquement l'ID pour le hashCode
+    return Objects.hash(id);
   }
 
   @Override
@@ -36,7 +36,7 @@ public class Inventory {
     if (this == obj) return true;
     if (obj == null || getClass() != obj.getClass()) return false;
     Inventory that = (Inventory) obj;
-    return Objects.equals(id, that.id);  // Comparez uniquement les IDs
+    return Objects.equals(id, that.id);
   }
 
 }

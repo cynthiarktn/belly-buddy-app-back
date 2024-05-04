@@ -8,6 +8,7 @@ import com.fr.eql.ai115.bellybuddyback.repository.RecipeRepository;
 import com.fr.eql.ai115.bellybuddyback.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,21 +20,31 @@ public class FavoritesService {
   private RecipeRepository recipeRepository;
 
   @Autowired
-  private SpoonacularService spoonacularService;
-
-  @Autowired
   private UserRepository userRepository;
 
   @Autowired
   private DishTypeRepository dishTypeRepository;
 
-  public Recipe addRecipeToFavorites(Long userId, Long recipeId) throws Exception {
-    // Get the complete recipe information from Spoonacular API
-    CompleteRecipeResponse recipeInfo = spoonacularService.getCompleteRecipeById(recipeId);
+  @Autowired
+  private FavoritesRepository favoritesRepository;
 
-    // Create a new Recipe object and set its fields based on the recipeInfo
+  public Favorites findOrCreateFavoritesForUser(Long userId) {
+    UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+    Favorites favorites = user.getFavorites();
+    if (favorites == null) {
+      favorites = new Favorites();
+      favorites.setUser(user);
+      user.setFavorites(favorites);
+      favoritesRepository.save(favorites);
+    }
+    return favorites;
+  }
+
+  public Recipe addRecipeToFavorites(Long userId, Long recipeId, CompleteRecipeResponse recipeInfo) throws Exception {
+    Favorites favorites = findOrCreateFavoritesForUser(userId);
     Recipe recipe = new Recipe();
     recipe.setId(recipeInfo.getId());
+    recipe.setSpoonacularId(recipeId);
     recipe.setTitle(recipeInfo.getTitle());
     recipe.setImage(recipeInfo.getImage());
     recipe.setServings(recipeInfo.getServings());
@@ -51,55 +62,38 @@ public class FavoritesService {
     recipe.setDishTypes(dishTypes);
 
     // Set ingredients
-    Set<RecipeIngredient> ingredients = recipeInfo.getExtendedIngredients().stream()
+    Set<RecipeIngredients> ingredients = recipeInfo.getExtendedIngredients().stream()
       .map(ingredientResponse -> {
-        RecipeIngredient ingredient = new RecipeIngredient();
+        RecipeIngredients ingredient = new RecipeIngredients();
         ingredient.setName(ingredientResponse.getName());
+        ingredient.setAmount(Double.valueOf(ingredientResponse.getAmount()));
+        ingredient.setUnit(String.valueOf(ingredientResponse.getUnit()));
+        ingredient.setOriginal(ingredientResponse.getOriginal());
+        ingredient.setRecipe(recipe);
         return ingredient;
       })
       .collect(Collectors.toSet());
     recipe.setIngredients(ingredients);
 
-    // Set instructions
-    Set<RecipeInstructions> instructions = recipeInfo.getAnalyzedInstructions().stream()
-      .map(instructionResponse -> {
-        RecipeInstructions recipeInstructions = new RecipeInstructions();
-        Set<InstructionSteps> steps = instructionResponse.getSteps().stream()
-          .map(stepResponse -> {
-            InstructionSteps step = new InstructionSteps();
-            step.setStep(stepResponse.getStep());
-            // Set other fields as necessary...
-            return step;
-          })
-          .collect(Collectors.toSet());
-        recipeInstructions.setSteps(steps);
-        return recipeInstructions;
-      })
-      .collect(Collectors.toSet());
-    recipe.setInstructions(instructions);
-
-    // Save the recipe to the database
+    recipe.setFavorites(favorites);
     Recipe savedRecipe = recipeRepository.save(recipe);
-
-    // Add the saved recipe to the user's favorites
-    // This assumes that you have a method to add a recipe to a user's favorites
-    addUserFavorite(userId, savedRecipe);
-
-    return savedRecipe;
+    favorites.getRecipes().add(savedRecipe);
+    favoritesRepository.save(favorites);
+    return recipe;
   }
 
-  // Method to add a recipe to a user's favorites
-  private void addUserFavorite(Long userId, Recipe recipe) {
-    UserEntity user = userRepository.findById(userId)
-      .orElseThrow(() -> new RuntimeException("User not found"));
-
-    Favorites favorites = user.getFavorites();
-    if (favorites == null) {
-      favorites = new Favorites();
-      user.setFavorites(favorites);
+  @Transactional
+  public void removeRecipeFromFavorites(Long userId, Long recipeId) {
+    Favorites favorites = findOrCreateFavoritesForUser(userId);
+    Recipe recipe = recipeRepository.findById(recipeId)
+      .orElseThrow(() -> new RuntimeException("Recipe not found"));
+    if (favorites.getRecipes().contains(recipe)) {
+      favorites.getRecipes().remove(recipe);
+      favoritesRepository.save(favorites);
+      recipeRepository.delete(recipe);
+    } else {
+      throw new RuntimeException("Recipe not found in favorites");
     }
-
-    favorites.getRecipes().add(recipe);
-    userRepository.save(user);
   }
+
 }

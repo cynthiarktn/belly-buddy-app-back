@@ -17,9 +17,27 @@ public class FavoritesController {
   @Autowired
   private FavoritesService favoritesService;
 
-  @PostMapping("/{userId}/{recipeId}")
-  public ResponseEntity<Recipe> addRecipeToFavorites(@PathVariable Long userId, @PathVariable Long recipeId) throws Exception {
-    Recipe recipe = favoritesService.addRecipeToFavorites(userId, recipeId);
-    return ResponseEntity.ok(recipe);
+  @Autowired
+  private SpoonacularService spoonacularService;
+
+  @PostMapping("/add/{userId}/{recipeId}")
+  public ResponseEntity<?> addRecipeToFavorites(@PathVariable Long userId, @PathVariable Long recipeId) throws Exception {
+    try {
+      CompleteRecipeResponse recipeInfo = spoonacularService.getCompleteRecipeById(recipeId);
+      Recipe recipe = favoritesService.addRecipeToFavorites(userId, recipeId, recipeInfo);
+      return ResponseEntity.ok(recipe);
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().body("Failed to add recipe to favorites: " + e.getMessage());
+    }
+  }
+
+  @DeleteMapping("/remove/{userId}/{recipeId}")
+  public ResponseEntity<?> removeRecipeFromFavorites(@PathVariable Long userId, @PathVariable Long recipeId) {
+    try {
+      favoritesService.removeRecipeFromFavorites(userId, recipeId);
+      return ResponseEntity.ok("Recipe removed from favorites");
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().body("Failed to remove recipe from favorites: " + e.getMessage());
+    }
   }
 }
