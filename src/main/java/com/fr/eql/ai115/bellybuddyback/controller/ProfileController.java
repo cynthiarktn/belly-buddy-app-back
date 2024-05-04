@@ -1,6 +1,6 @@
 package com.fr.eql.ai115.bellybuddyback.controller;
 
-import com.fr.eql.ai115.bellybuddyback.dto.RegisterDto;
+import com.fr.eql.ai115.bellybuddyback.dto.auth.RegisterDto;
 import com.fr.eql.ai115.bellybuddyback.service.CustomUserDetailsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

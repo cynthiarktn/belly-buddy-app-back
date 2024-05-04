@@ -4,19 +4,18 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Entity
-@Table(name = "favorite_list")
+@Table(name = "dish_type")
 @Data
-@NoArgsConstructor
-public class FavoriteRecipe {
+public class DishType {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  private String name;
 
-  @ManyToOne
-  @JoinColumn(name = "recipe_id")
-  private Recipe recipe;
-
-  @ManyToOne
-  private UserEntity user;
+  @ManyToMany(mappedBy = "dishTypes")
+  private Set<Recipe> recipes;
 }

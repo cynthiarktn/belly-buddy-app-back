@@ -2,16 +2,19 @@ package com.fr.eql.ai115.bellybuddyback.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-public class InstructionsSteps {
+@NoArgsConstructor
+@Table(name = "instruction_steps")
+public class InstructionSteps {
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   private String step;
 
   @ManyToOne
-  @JoinColumn(name = "instruction_id")
+  @JoinColumn(name = "recipe_instructions_id")
   private RecipeInstructions recipeInstructions;
 }

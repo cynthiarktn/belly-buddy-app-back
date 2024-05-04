@@ -1,51 +1,45 @@
 package com.fr.eql.ai115.bellybuddyback.controller;
 
-import com.fr.eql.ai115.bellybuddyback.dto.InventoryItemDto;
+import com.fr.eql.ai115.bellybuddyback.dto.apiresponse.IngredientResponse;
 import com.fr.eql.ai115.bellybuddyback.model.Ingredient;
-import com.fr.eql.ai115.bellybuddyback.model.InventoryItem;
-import com.fr.eql.ai115.bellybuddyback.model.UserEntity;
-import com.fr.eql.ai115.bellybuddyback.repository.UserRepository;
 import com.fr.eql.ai115.bellybuddyback.service.InventoryService;
+import com.fr.eql.ai115.bellybuddyback.service.SpoonacularService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-import java.util.List;
-
 @RestController
-@RequestMapping("api/user/inventory")
+@RequestMapping("/api/user/inventory")
 public class InventoryController {
-  private final InventoryService inventoryService;
-  private final UserRepository userRepository;
 
   @Autowired
-  public InventoryController(InventoryService inventoryService, UserRepository userRepository) {
-    this.inventoryService = inventoryService;
-    this.userRepository = userRepository;
+  private InventoryService inventoryService;
+
+  @Autowired
+  private SpoonacularService spoonacularService;
+
+  // Endpoint to add an ingredient to the user's inventory
+  @PostMapping("/add/{userId}/{ingredientId}")
+  public ResponseEntity<?> addIngredientToInventory(@PathVariable Long userId, @PathVariable Long ingredientId) {
+    try {
+      IngredientResponse ingredientInfo = spoonacularService.getIngredientInformation(ingredientId);
+      Ingredient ingredient = inventoryService.addIngredientToInventory(userId, ingredientId, ingredientInfo);
+      return ResponseEntity.ok(ingredient);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to add ingredient to inventory: " + e.getMessage());
+    }
   }
 
-  @GetMapping("/getIngredients")
-  public ResponseEntity<List<InventoryItem>> getInventoryIngredients(@AuthenticationPrincipal UserDetails userDetails) throws Exception {
-    List<InventoryItem> ingredients = inventoryService.getAllInventoryItems(userDetails.getUsername());
-    return ResponseEntity.ok(ingredients);
+  @DeleteMapping("/remove/{userId}/{ingredientId}")
+  public ResponseEntity<?> removeIngredientFromInventory(@PathVariable Long userId, @PathVariable Long ingredientId) {
+    try {
+      inventoryService.removeIngredientFromInventory(userId, ingredientId);
+      return ResponseEntity.ok("Ingredient removed from inventory");
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to remove ingredient from inventory: " + e.getMessage());
+    }
   }
-
-  @PostMapping("/addIngredient")
-  public ResponseEntity<InventoryItemDto> addIngredient(@RequestBody Ingredient ingredient, Principal principal) throws Exception {
-    UserEntity user = userRepository.findByUsername(principal.getName())
-      .orElseThrow(() -> new Exception("User not found"));
-    InventoryItemDto addedItem = inventoryService.addIngredientToInventory(ingredient, user);
-    return ResponseEntity.ok(addedItem);
-  }
-
-  @DeleteMapping("/deleteIngredient/{id}")
-  public ResponseEntity<String> deleteIngredient(@PathVariable Long id) throws Exception {
-    inventoryService.deleteInventoryItem(id);
-    return ResponseEntity.ok("Ingredient deleted");
-  }
-
-
 }
+

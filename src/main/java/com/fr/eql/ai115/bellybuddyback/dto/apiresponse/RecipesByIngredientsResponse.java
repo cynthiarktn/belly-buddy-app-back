@@ -1,8 +1,8 @@
-package com.fr.eql.ai115.bellybuddyback.spoonaculardto;
+package com.fr.eql.ai115.bellybuddyback.dto.apiresponse;
 
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 public class RecipesByIngredientsResponse {
@@ -12,7 +12,6 @@ public class RecipesByIngredientsResponse {
   private int usedIngredientCount;
   private int missedIngredientCount;
   private int likes;
-
-  private List<RecipeIngredient> usedIngredients;
-  private List<RecipeIngredient> missedIngredients;
+  private Set<RecipeIngredientResponse> usedIngredients;
+  private Set<RecipeIngredientResponse> missedIngredients;
 }

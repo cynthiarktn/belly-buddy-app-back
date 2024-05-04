@@ -1,46 +1,43 @@
 package com.fr.eql.ai115.bellybuddyback.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "user")
+@Table(name = "inventory")
 @Data
 @NoArgsConstructor
-public class UserEntity {
-
+public class Inventory {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private String username;
-  private String email;
-  private String password;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-  private Inventory inventory;
+  @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JsonManagedReference
+  private Set<Ingredient> ingredients = new HashSet<>();
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-  private Favorites favorites;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private UserEntity user;
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);  // Encore, utilisez uniquement l'ID
+    return Objects.hash(id);  // Utilisez uniquement l'ID pour le hashCode
   }
 
   @Override
   public boolean equals(Object obj) {
     if (this == obj) return true;
     if (obj == null || getClass() != obj.getClass()) return false;
-    UserEntity that = (UserEntity) obj;
+    Inventory that = (Inventory) obj;
     return Objects.equals(id, that.id);  // Comparez uniquement les IDs
   }
 
 }
-
 

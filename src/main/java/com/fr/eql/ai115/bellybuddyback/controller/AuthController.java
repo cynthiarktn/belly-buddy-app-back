@@ -1,8 +1,8 @@
 package com.fr.eql.ai115.bellybuddyback.controller;
 
-import com.fr.eql.ai115.bellybuddyback.dto.AuthResponseDto;
-import com.fr.eql.ai115.bellybuddyback.dto.LoginDto;
-import com.fr.eql.ai115.bellybuddyback.dto.RegisterDto;
+import com.fr.eql.ai115.bellybuddyback.dto.auth.AuthResponseDto;
+import com.fr.eql.ai115.bellybuddyback.dto.auth.LoginDto;
+import com.fr.eql.ai115.bellybuddyback.dto.auth.RegisterDto;
 import com.fr.eql.ai115.bellybuddyback.model.UserEntity;
 import com.fr.eql.ai115.bellybuddyback.repository.UserRepository;
 import com.fr.eql.ai115.bellybuddyback.security.jwt.JWTGenerator;

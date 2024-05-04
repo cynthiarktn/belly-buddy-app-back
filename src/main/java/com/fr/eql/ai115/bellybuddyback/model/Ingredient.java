@@ -1,19 +1,22 @@
 package com.fr.eql.ai115.bellybuddyback.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
 
 @Entity
 @Data
 public class Ingredient {
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  private Long spoonacularId;
   private String name;
   private String image;
 
-  @OneToMany(mappedBy = "ingredient")
-  private List<InventoryItem> inventoryItems;
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "inventory_id")
+  @JsonBackReference
+  private Inventory inventory;
 }

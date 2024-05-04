@@ -1,83 +1,70 @@
 package com.fr.eql.ai115.bellybuddyback.service;
 
-import com.fr.eql.ai115.bellybuddyback.dto.InventoryItemDto;
 import com.fr.eql.ai115.bellybuddyback.model.Ingredient;
-import com.fr.eql.ai115.bellybuddyback.model.InventoryItem;
+import com.fr.eql.ai115.bellybuddyback.model.Inventory;
 import com.fr.eql.ai115.bellybuddyback.model.UserEntity;
 import com.fr.eql.ai115.bellybuddyback.repository.IngredientRepository;
-import com.fr.eql.ai115.bellybuddyback.repository.InventoryItemRepository;
-import com.fr.eql.ai115.bellybuddyback.spoonaculardto.IngredientResponse;
-import com.fr.eql.ai115.bellybuddyback.spoonaculardto.IngredientResults;
+import com.fr.eql.ai115.bellybuddyback.repository.InventoryRepository;
+import com.fr.eql.ai115.bellybuddyback.repository.UserRepository;
+import com.fr.eql.ai115.bellybuddyback.dto.apiresponse.IngredientResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.HashSet;
 
 @Service
 public class InventoryService {
 
   @Autowired
-  private InventoryItemRepository inventoryRepository;
+  private InventoryRepository inventoryRepository;
 
   @Autowired
   private IngredientRepository ingredientRepository;
 
   @Autowired
-  private SpoonacularService spoonacularService;
+  private UserRepository userRepository;
 
-  // Cette méthode appelle l'API Spoonacular pour récupérer les ingrédients correspondant à une recherche
-  public IngredientResults getIngredients(String ingredientName) throws Exception {
-    return spoonacularService.searchIngredient(ingredientName);
-  }
-
-  // Cette méthode récupère tous les éléments de l'inventaire
-  public List<InventoryItem> getAllInventoryItems(String username) throws Exception {
-    if (username == null) {
-      throw new Exception("No user found");
+  // Supposons que vous avez un méthode pour obtenir ou créer un inventaire
+  public Inventory findOrCreateInventoryForUser(Long userId) {
+    UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+    Inventory inventory = user.getInventory();
+    if (inventory == null) {
+      inventory = new Inventory();
+      inventory.setUser(user);
+      user.setInventory(inventory);
+      inventoryRepository.save(inventory);
     }
-    return inventoryRepository.findAll();
+    return inventory;
   }
 
-  // Cette méthode ajoute un nouvel élément à l'inventaire
-  public InventoryItemDto addIngredientToInventory(Ingredient ingredient, UserEntity user) {
-    // Check if the ingredient already exists in the database
-    Optional<Ingredient> existingIngredient = ingredientRepository.findById(ingredient.getId());
-    if (!existingIngredient.isPresent()) {
-      // If the ingredient does not exist, save it
-      ingredient = ingredientRepository.save(ingredient);
+  public Ingredient addIngredientToInventory(Long userId, Long ingredientId, IngredientResponse ingredientInfo) {
+    Inventory inventory = findOrCreateInventoryForUser(userId);
+    Ingredient ingredient = new Ingredient();
+    ingredient.setName(ingredientInfo.getName());
+    ingredient.setImage(ingredientInfo.getImage());
+    ingredient.setSpoonacularId(ingredientId);
+    ingredient.setInventory(inventory);
+    Ingredient addedIngredient = ingredientRepository.save(ingredient);
+    inventory.getIngredients().add(addedIngredient);
+    inventoryRepository.save(inventory);
+    return ingredient;
+  }
+
+  @Transactional
+  public void removeIngredientFromInventory(Long userId, Long ingredientId) {
+    Inventory inventory = findOrCreateInventoryForUser(userId);
+    Ingredient ingredient = ingredientRepository.findById(ingredientId)
+      .orElseThrow(() -> new RuntimeException("Ingredient not found"));
+    if (inventory.getIngredients().contains(ingredient)) {
+      inventory.getIngredients().remove(ingredient);
+      inventoryRepository.save(inventory);
+      ingredientRepository.delete(ingredient);
     } else {
-      // If the ingredient exists, use the existing one
-      ingredient = existingIngredient.get();
+      throw new RuntimeException("Ingredient not found in inventory");
     }
-
-    // Create the new inventory item
-    InventoryItem item = new InventoryItem();
-    item.setIngredient(ingredient);
-    item.setUser(user);
-    InventoryItem savedItem = inventoryRepository.save(item);
-
-    // Convert to DTO
-    InventoryItemDto dto = new InventoryItemDto();
-    dto.setId(savedItem.getId());
-    dto.setName(savedItem.getIngredient().getName());
-
-    return dto;
-  }
-
-  // Cette méthode met à jour un élément de l'inventaire
-  public InventoryItem updateInventoryItem(InventoryItem item) throws Exception {
-    if (!inventoryRepository.existsById(item.getId())) {
-      throw new Exception("Item not found");
-    }
-    return inventoryRepository.save(item);
-  }
-
-  // Cette méthode supprime un élément de l'inventaire
-  public void deleteInventoryItem(Long id) throws Exception {
-    if (!inventoryRepository.existsById(id)) {
-      throw new Exception("Item not found");
-    }
-    inventoryRepository.deleteById(id);
   }
 }
+
+
+

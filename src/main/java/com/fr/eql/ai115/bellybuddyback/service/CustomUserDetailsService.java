@@ -1,6 +1,6 @@
 package com.fr.eql.ai115.bellybuddyback.service;
 
-import com.fr.eql.ai115.bellybuddyback.dto.RegisterDto;
+import com.fr.eql.ai115.bellybuddyback.dto.auth.RegisterDto;
 import com.fr.eql.ai115.bellybuddyback.model.UserEntity;
 import com.fr.eql.ai115.bellybuddyback.repository.UserRepository;
 import org.springframework.security.core.userdetails.User;
@@ -41,8 +41,5 @@ public class CustomUserDetailsService implements UserDetailsService {
     return user;
   }
 
-  public UserEntity get(Long id) {
-    return userRepository.findById(id).orElse(null);
-  }
 
 }

@@ -4,20 +4,22 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
-@Table(name = "inventory")
+@Table(name = "favorites")
 @Data
 @NoArgsConstructor
-public class InventoryItem {
+public class Favorites {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne
-  @JoinColumn(name = "ingredient_id")
-  private Ingredient ingredient;
-
-  @ManyToOne
+  @OneToOne
   private UserEntity user;
 
+  @OneToMany(mappedBy = "favorites", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<Recipe> recipes = new HashSet<>();
 }

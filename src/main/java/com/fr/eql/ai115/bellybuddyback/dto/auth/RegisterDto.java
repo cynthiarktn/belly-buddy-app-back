@@ -1,4 +1,4 @@
-package com.fr.eql.ai115.bellybuddyback.dto;
+package com.fr.eql.ai115.bellybuddyback.dto.auth;
 
 import lombok.Data;
 
